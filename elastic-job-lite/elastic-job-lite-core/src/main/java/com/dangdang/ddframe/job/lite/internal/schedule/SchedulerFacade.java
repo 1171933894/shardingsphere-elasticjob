@@ -38,25 +38,55 @@ import java.util.List;
  * @author zhangliang
  */
 public final class SchedulerFacade {
-    
+
+    /**
+     * 作业名称
+     */
     private final String jobName;
-    
+
+    /**
+     * 作业配置服务
+     */
     private final ConfigurationService configService;
-    
+
+    /**
+     * 主节点服务
+     */
     private final LeaderService leaderService;
-    
+
+    /**
+     * 作业服务器服务
+     */
     private final ServerService serverService;
-    
+
+    /**
+     * 作业运行实例服务
+     */
     private final InstanceService instanceService;
-    
+
+    /**
+     * 作业分片服务
+     */
     private final ShardingService shardingService;
-    
+
+    /**
+     * 执行作业服务
+     */
     private final ExecutionService executionService;
-    
+
+    /**
+     * 作业监控服务
+     */
     private final MonitorService monitorService;
-    
+
+    /**
+     * 调解作业不一致状态服务
+     */
     private final ReconcileService reconcileService;
-    
+
+    /**
+     * 作业注册中心的监听器管理者
+     */
     private ListenerManager listenerManager;
     
     public SchedulerFacade(final CoordinatorRegistryCenter regCenter, final String jobName) {
@@ -100,6 +130,10 @@ public final class SchedulerFacade {
      * @return 更新后的作业配置
      */
     public LiteJobConfiguration updateJobConfiguration(final LiteJobConfiguration liteJobConfig) {
+        /**
+         * 调用 ConfigService#persist(...) 方法也不一定会更新作业配置，因此调用 ConfigService#load(...)
+         * 方法返回的可能是本地的作业配置，也可能是注册中心存储的作业配置
+         */
         configService.persist(liteJobConfig);
         return configService.load(false);
     }

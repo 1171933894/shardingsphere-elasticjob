@@ -35,11 +35,21 @@ import org.quartz.TriggerKey;
  */
 @RequiredArgsConstructor
 public final class JobScheduleController {
-    
+
+    /**
+     * Quartz 调度器
+     */
     private final Scheduler scheduler;
-    
+
+    /**
+     * 作业信息
+     */
     private final JobDetail jobDetail;
-    
+
+    /**
+     * 触发器编号
+     * 目前使用工作名字( jobName )
+     */
     private final String triggerIdentity;
     
     /**

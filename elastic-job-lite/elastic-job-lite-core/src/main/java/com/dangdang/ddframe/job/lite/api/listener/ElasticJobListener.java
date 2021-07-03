@@ -20,7 +20,7 @@ package com.dangdang.ddframe.job.lite.api.listener;
 import com.dangdang.ddframe.job.executor.ShardingContexts;
 
 /**
- * 弹性化分布式作业监听器接口.
+ * 弹性化分布式作业监听器接口.（实现对作业执行的同步监听、处理）
  * 
  * @author zhangliang
  */

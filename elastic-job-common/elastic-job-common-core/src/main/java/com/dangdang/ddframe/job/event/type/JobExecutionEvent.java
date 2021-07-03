@@ -29,7 +29,7 @@ import java.util.Date;
 import java.util.UUID;
 
 /**
- * 作业执行事件.
+ * 作业执行事件.（实现对作业事件的异步监听、处理）
  *
  * @author zhangliang
  */

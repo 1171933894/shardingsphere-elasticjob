@@ -24,7 +24,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 简单作业配置.
+ * 简单作业配置.（简单作业。例如：订单过期作业）
  * 
  * @author caohao
  * @author zhangliang
