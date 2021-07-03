@@ -136,13 +136,15 @@ public class JobScheduler {
         JobRegistry.getInstance().registerJob(liteJobConfigFromRegCenter.getJobName(), jobScheduleController, regCenter);
         // 注册 作业启动信息
         schedulerFacade.registerStartUpInfo(!liteJobConfigFromRegCenter.isDisabled());
-        // 调度作业
+        // 调度作业（调用 #scheduleJob() 方法后，该 Elastic-Job 作业开始被调度）
         jobScheduleController.scheduleJob(liteJobConfigFromRegCenter.getTypeConfig().getCoreConfig().getCron());
     }
     
     private JobDetail createJobDetail(final String jobClass) {
+        // 创建 Quartz 作业（创建 Quartz 作业设置了 LiteJob 类，这样 Quartz 触发作业执行时，LiteJob 会去调用 Elastic-Job 作业对象）
         JobDetail result = JobBuilder.newJob(LiteJob.class).withIdentity(liteJobConfig.getJobName()).build();
         result.getJobDataMap().put(JOB_FACADE_DATA_MAP_KEY, jobFacade);
+        // 创建 Elastic-Job 对象
         Optional<ElasticJob> elasticJobInstance = createElasticJobInstance();
         if (elasticJobInstance.isPresent()) {
             result.getJobDataMap().put(ELASTIC_JOB_DATA_MAP_KEY, elasticJobInstance.get());
@@ -159,7 +161,10 @@ public class JobScheduler {
     protected Optional<ElasticJob> createElasticJobInstance() {
         return Optional.absent();
     }
-    
+
+    /**
+     * 创建 Quartz 调度器
+     */
     private Scheduler createScheduler() {
         Scheduler result;
         try {
@@ -176,11 +181,15 @@ public class JobScheduler {
     private Properties getBaseQuartzProperties() {
         Properties result = new Properties();
         result.put("org.quartz.threadPool.class", org.quartz.simpl.SimpleThreadPool.class.getName());
-        result.put("org.quartz.threadPool.threadCount", "1");
+        /**
+         * 即 Quartz 执行作业线程数量为 1。原因：一个作业( ElasticJob )的调度，
+         * 需要配置独有的一个作业调度器( JobScheduler )，两者是 1 : 1 的关系
+         */
+        result.put("org.quartz.threadPool.threadCount", "1");// Quartz 线程数：1
         result.put("org.quartz.scheduler.instanceName", liteJobConfig.getJobName());
         result.put("org.quartz.jobStore.misfireThreshold", "1");
-        result.put("org.quartz.plugin.shutdownhook.class", JobShutdownHookPlugin.class.getName());
-        result.put("org.quartz.plugin.shutdownhook.cleanShutdown", Boolean.TRUE.toString());
+        result.put("org.quartz.plugin.shutdownhook.class", JobShutdownHookPlugin.class.getName());// 作业关闭钩子
+        result.put("org.quartz.plugin.shutdownhook.cleanShutdown", Boolean.TRUE.toString());// 关闭时，清理所有资源
         return result;
     }
 }

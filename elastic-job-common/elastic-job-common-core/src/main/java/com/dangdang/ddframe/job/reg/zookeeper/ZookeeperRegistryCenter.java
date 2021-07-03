@@ -317,7 +317,7 @@ public final class ZookeeperRegistryCenter implements CoordinatorRegistryCenter 
         }
         caches.put(cachePath + "/", cache);
     }
-    
+
     @Override
     public void evictCacheData(final String cachePath) {
         TreeCache cache = caches.remove(cachePath + "/");
