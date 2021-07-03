@@ -40,6 +40,7 @@ public final class RegExceptionHandler {
      * 
      * @param cause 待处理异常.
      */
+    // 部分异常会被无视，仅打印异常。例如调用 #getDirectly(...) 获得注册数据时，可能节点不存在，抛出 NodeExistsException，这种异常可以无视
     public static void handleException(final Exception cause) {
         if (null == cause) {
             return;

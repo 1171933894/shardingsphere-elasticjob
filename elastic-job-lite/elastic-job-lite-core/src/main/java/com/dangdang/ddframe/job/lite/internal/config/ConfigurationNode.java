@@ -24,6 +24,34 @@ import com.dangdang.ddframe.job.lite.internal.storage.JobNodePath;
  * 
  * @author zhangliang
  */
+
+/**
+ * [zk: localhost: 2181(CONNECTED)67]get/elastic-job-example-lite-java/javaSimpleJob/config
+ *
+ * {
+ * 	"jobName": "javaSimpleJob",
+ * 	"jobClass": "com.dangdang.ddframe.job.example.job.simple.JavaSimpleJob",
+ * 	"jobType": "SIMPLE",
+ * 	"cron": "0/5 * * * * ?",
+ * 	"shardingTotalCount": 3,
+ * 	"shardingItemParameters": "0\u003dBeijing,1\u003dShanghai,2\u003dGuangzhou",
+ * 	"jobParameter": "",
+ * 	"failover": true,
+ * 	"misfire": true,
+ * 	"description": "",
+ * 	"jobProperties": {
+ * 		"job_exception_handler": "com.dangdang.ddframe.job.executor.handler.impl.DefaultJobExceptionHandler",
+ * 		"executor_service_handler": "com.dangdang.ddframe.job.executor.handler.impl.DefaultExecutorServiceHandler"
+ *        },
+ * 	"monitorExecution": true,
+ * 	"maxTimeDiffSeconds": -1,
+ * 	"monitorPort": -1,
+ * 	"jobShardingStrategyClass": "",
+ * 	"reconcileIntervalMinutes": 10,
+ * 	"disabled": false,
+ * 	"overwrite": true
+ * }
+ */
 public final class ConfigurationNode {
     
     static final String ROOT = "config";

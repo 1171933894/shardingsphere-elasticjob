@@ -28,6 +28,15 @@ import java.util.regex.Pattern;
  * 
  * @author zhangliang
  */
+
+/**
+ * [zk: localhost:2181(CONNECTED) 72] ls /elastic-job-example-lite-java/javaSimpleJob/servers
+ * [192.168.16.164, 169.254.93.156, 192.168.252.57, 192.168.16.137, 192.168.3.2, 192.168.43.31]
+ * [zk: localhost:2181(CONNECTED) 73] get /elastic-job-example-lite-java/javaSimpleJob/servers/192.168.16.164
+ *
+ * /servers/ 目录下以 IP 为数据节点路径存储每个服务器节点。如果相同IP服务器有多个服务器节点，只存储一个 IP 数据节点。
+ * /servers/${IP} 是持久节点，不存储任何信息，只是空串( "");
+ */
 public final class ServerNode {
     
     /**

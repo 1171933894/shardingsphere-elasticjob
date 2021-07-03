@@ -71,6 +71,8 @@ public final class ZookeeperRegistryCenter implements CoordinatorRegistryCenter 
         log.debug("Elastic job: zookeeper registry center init, server lists is: {}.", zkConfig.getServerLists());
         CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder()
                 .connectString(zkConfig.getServerLists())
+                // ExponentialBackoffRetry，当 Zookeeper 失去链接后重新连接的一种策略：动态计算每次计算重连的间隔，
+                // 时间间隔 = baseSleepTimeMs * Math.max(1, random.nextInt(1 << (retryCount + 1)))
                 .retryPolicy(new ExponentialBackoffRetry(zkConfig.getBaseSleepTimeMilliseconds(), zkConfig.getMaxRetries(), zkConfig.getMaxSleepTimeMilliseconds()))
                 .namespace(zkConfig.getNamespace());
         if (0 != zkConfig.getSessionTimeoutMilliseconds()) {
@@ -163,7 +165,10 @@ public final class ZookeeperRegistryCenter implements CoordinatorRegistryCenter 
             return null;
         }
     }
-    
+
+    /**
+     * 获得注册子节点（获取子节点名称集合(降序)）
+     */
     @Override
     public List<String> getChildrenKeys(final String key) {
         try {
@@ -183,7 +188,10 @@ public final class ZookeeperRegistryCenter implements CoordinatorRegistryCenter 
             return Collections.emptyList();
         }
     }
-    
+
+    /**
+     * 获取子节点数量
+     */
     @Override
     public int getNumChildren(final String key) {
         try {
@@ -229,6 +237,7 @@ public final class ZookeeperRegistryCenter implements CoordinatorRegistryCenter 
     @Override
     public void update(final String key, final String value) {
         try {
+            // 使用事务校验键( key )存在才进行更新
             client.inTransaction().check().forPath(key).and().setData().forPath(key, value.getBytes(Charsets.UTF_8)).and().commit();
         //CHECKSTYLE:OFF
         } catch (final Exception ex) {
@@ -284,7 +293,10 @@ public final class ZookeeperRegistryCenter implements CoordinatorRegistryCenter 
             RegExceptionHandler.handleException(ex);
         }
     }
-    
+
+    /**
+     * 通过更新节点，获得该节点的最后更新时间( mtime )获得 Zookeeper 的时间
+     */
     @Override
     public long getRegistryCenterTime(final String key) {
         long result = 0L;

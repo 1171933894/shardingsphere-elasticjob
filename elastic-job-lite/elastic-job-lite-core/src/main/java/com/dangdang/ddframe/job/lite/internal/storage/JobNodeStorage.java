@@ -186,6 +186,13 @@ public final class JobNodeStorage {
     public void executeInLeader(final String latchNode, final LeaderExecutionCallback callback) {
         try (LeaderLatch latch = new LeaderLatch(getClient(), jobNodePath.getFullPath(latchNode))) {
             latch.start();
+            /**
+             * Apache Curator 使用 Zookeeper 实现了两种分布式锁，LeaderLatch 是其中的一种。使用一个
+             * Zookeeper 节点路径创建一个 LeaderLatch，#start() 后，调用 #await() 等待拿到这把锁。
+             * 如果有多个线程执行了相同节点路径的 LeaderLatch 的 #await() 后，同一时刻有且仅有一个线程
+             * 可以继续执行，其他线程需要等待。当该线程释放( LeaderLatch#close() )后，下一个线程可以拿
+             * 到该锁继续执行
+             */
             latch.await();
             callback.execute();
         //CHECKSTYLE:OFF
