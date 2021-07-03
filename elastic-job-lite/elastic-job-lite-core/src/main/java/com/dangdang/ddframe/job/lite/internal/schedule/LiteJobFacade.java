@@ -80,6 +80,9 @@ public final class LiteJobFacade implements JobFacade {
     
     @Override
     public void checkJobExecutionEnvironment() throws JobExecutionEnvironmentException {
+        /**
+         * 调用 ConfigService#checkMaxTimeDiffSecondsTolerable() 方法校验本机时间是否合法
+         */
         configService.checkMaxTimeDiffSecondsTolerable();
     }
     

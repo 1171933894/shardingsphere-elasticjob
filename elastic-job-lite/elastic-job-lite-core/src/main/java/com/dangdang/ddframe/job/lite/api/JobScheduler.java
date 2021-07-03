@@ -122,7 +122,7 @@ public class JobScheduler {
     }
     
     /**
-     * 初始化作业.
+     * 初始化作业.MoreExecutors#getExitingExecutorService
      */
     public void init() {
         // 更新 作业配置

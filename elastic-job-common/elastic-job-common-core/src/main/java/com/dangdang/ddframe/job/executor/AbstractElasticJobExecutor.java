@@ -45,27 +45,44 @@ import java.util.concurrent.ExecutorService;
  */
 @Slf4j
 public abstract class AbstractElasticJobExecutor {
-    
+    /**
+     * 作业门面对象
+     */
     @Getter(AccessLevel.PROTECTED)
     private final JobFacade jobFacade;
-    
+    /**
+     * 作业配置
+     */
     @Getter(AccessLevel.PROTECTED)
     private final JobRootConfiguration jobRootConfig;
-    
+    /**
+     * 作业名称
+     */
     private final String jobName;
-    
+    /**
+     * 作业执行线程池
+     */
     private final ExecutorService executorService;
-    
+    /**
+     * 作业异常处理器
+     */
     private final JobExceptionHandler jobExceptionHandler;
-    
+    /**
+     * 分片错误信息集合
+     * key：分片序号
+     */
     private final Map<Integer, String> itemErrorMessages;
     
     protected AbstractElasticJobExecutor(final JobFacade jobFacade) {
         this.jobFacade = jobFacade;
+        // 加载 作业配置
         jobRootConfig = jobFacade.loadJobRootConfiguration(true);
         jobName = jobRootConfig.getTypeConfig().getCoreConfig().getJobName();
+        // 获取 作业执行线程池
         executorService = ExecutorServiceHandlerRegistry.getExecutorServiceHandler(jobName, (ExecutorServiceHandler) getHandler(JobProperties.JobPropertiesEnum.EXECUTOR_SERVICE_HANDLER));
+        // 获取 作业异常处理器
         jobExceptionHandler = (JobExceptionHandler) getHandler(JobProperties.JobPropertiesEnum.JOB_EXCEPTION_HANDLER);
+        // 设置 分片错误信息集合
         itemErrorMessages = new ConcurrentHashMap<>(jobRootConfig.getTypeConfig().getCoreConfig().getShardingTotalCount(), 1);
     }
     

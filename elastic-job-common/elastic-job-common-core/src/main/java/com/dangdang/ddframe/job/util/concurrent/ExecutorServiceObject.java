@@ -42,7 +42,7 @@ public final class ExecutorServiceObject {
         workQueue = new LinkedBlockingQueue<>();
         threadPoolExecutor = new ThreadPoolExecutor(threadSize, threadSize, 5L, TimeUnit.MINUTES, workQueue, 
                 new BasicThreadFactory.Builder().namingPattern(Joiner.on("-").join(namingPattern, "%s")).build());
-        threadPoolExecutor.allowCoreThreadTimeOut(true);
+        threadPoolExecutor.allowCoreThreadTimeOut(true);// 可以回收核心线程数
     }
     
     /**
@@ -51,6 +51,7 @@ public final class ExecutorServiceObject {
      * @return 线程池服务对象
      */
     public ExecutorService createExecutorService() {
+        // MoreExecutors#getExitingExecutorService(...) 方法逻辑：将 ThreadPoolExecutor 转换成 ExecutorService，并增加 JVM 关闭钩子，实现 120s 等待任务完成
         return MoreExecutors.listeningDecorator(MoreExecutors.getExitingExecutorService(threadPoolExecutor));
     }
     
