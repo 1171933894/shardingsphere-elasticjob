@@ -16,7 +16,7 @@ import org.apache.curator.framework.state.ConnectionStateListener;
  *
  * @author zhangliang
  */
-public final class RegistryCenterConnectionStateListener implements ConnectionStateListener {
+public final class RegistryCenterConnectionStateListener implements ConnectionStateListener  {
     
     private final String jobName;
     
@@ -42,8 +42,10 @@ public final class RegistryCenterConnectionStateListener implements ConnectionSt
             return;
         }
         JobScheduleController jobScheduleController = JobRegistry.getInstance().getJobScheduleController(jobName);
+        // 当注册中心连接 SUSPENDED 或 LOST 时，暂停本地作业调度
         if (ConnectionState.SUSPENDED == newState || ConnectionState.LOST == newState) {
             jobScheduleController.pauseJob();
+        // 当注册中心重新连接成功( RECONNECTED )，恢复本地作业调度
         } else if (ConnectionState.RECONNECTED == newState) {
             serverService.persistOnline(serverService.isEnableServer(JobRegistry.getInstance().getJobInstance(jobName).getIp()));
             instanceService.persistOnline();

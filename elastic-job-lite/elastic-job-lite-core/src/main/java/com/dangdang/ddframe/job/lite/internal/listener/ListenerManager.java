@@ -37,7 +37,16 @@ import java.util.List;
  * @author zhangliang
  */
 public final class ListenerManager {
-    
+
+    /**
+     *
+     * electionListenerManager / shardingListenerManager / failoverListenerManager / MonitorExecutionListenerManager / shutdownListenerManager
+     * / triggerListenerManager / rescheduleListenerManager / guaranteeListenerManager 是不同服务的监听管理器，都继承作业注册中心的监听器管理者的抽象类
+     * ( AbstractListenerManager )
+     *
+     * regCenterConnectionStateListener 是注册中心连接状态监听器。
+     */
+
     private final JobNodeStorage jobNodeStorage;
     
     private final ElectionListenerManager electionListenerManager;

@@ -38,7 +38,10 @@ public abstract class AbstractListenerManager {
      * 开启监听器.
      */
     public abstract void start();
-    
+
+    /**
+     * 将作业注册中心的监听器添加到注册中心 TreeCache 的监听者里
+     */
     protected void addDataListener(final TreeCacheListener listener) {
         jobNodeStorage.addDataListener(listener);
     }
