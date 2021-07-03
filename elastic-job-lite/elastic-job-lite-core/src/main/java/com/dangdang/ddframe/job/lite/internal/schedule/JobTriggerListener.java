@@ -24,7 +24,7 @@ import org.quartz.Trigger;
 import org.quartz.listeners.TriggerListenerSupport;
 
 /**
- * 作业触发监听器.
+ * 作业触发监听器.（使用 TriggerListener 监听被错过执行的作业分片项）
  * 
  * @author zhangliang
  */

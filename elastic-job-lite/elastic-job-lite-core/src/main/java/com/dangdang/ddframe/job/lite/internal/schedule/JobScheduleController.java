@@ -85,6 +85,7 @@ public final class JobScheduleController {
     }
     
     private CronTrigger createTrigger(final String cron) {
+        // withMisfireHandlingInstructionDoNothing())：下一次作业执行时，会补充执行被错过执行的作业分片项
         return TriggerBuilder.newTrigger().withIdentity(triggerIdentity).withSchedule(CronScheduleBuilder.cronSchedule(cron).withMisfireHandlingInstructionDoNothing()).build();
     }
     
