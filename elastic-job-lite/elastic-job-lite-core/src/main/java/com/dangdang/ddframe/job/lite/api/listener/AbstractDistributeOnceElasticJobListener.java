@@ -29,15 +29,25 @@ import lombok.Setter;
  * @author zhangliang
  */
 public abstract class AbstractDistributeOnceElasticJobListener implements ElasticJobListener {
-    
+    /**
+     * 开始超时时间
+     */
     private final long startedTimeoutMilliseconds;
-    
+    /**
+     * 开始等待对象
+     */
     private final Object startedWait = new Object();
-    
+    /**
+     * 完成超时时间
+     */
     private final long completedTimeoutMilliseconds;
-    
+    /**
+     * 完成等待对象
+     */
     private final Object completedWait = new Object();
-    
+    /**
+     * 保证分布式任务全部开始和结束状态的服务
+     */
     @Setter
     private GuaranteeService guaranteeService;
     
@@ -58,15 +68,17 @@ public abstract class AbstractDistributeOnceElasticJobListener implements Elasti
     
     @Override
     public final void beforeJobExecuted(final ShardingContexts shardingContexts) {
+        // 注册作业分片项开始运行
         guaranteeService.registerStart(shardingContexts.getShardingItemParameters().keySet());
+        // 判断是否所有的分片项开始运行
         if (guaranteeService.isAllStarted()) {
             doBeforeJobExecutedAtLastStarted(shardingContexts);
             guaranteeService.clearAllStartedInfo();
             return;
         }
         long before = timeService.getCurrentMillis();
-        try {
-            synchronized (startedWait) {
+        try {synchronized
+             (startedWait) {
                 startedWait.wait(startedTimeoutMilliseconds);
             }
         } catch (final InterruptedException ex) {
