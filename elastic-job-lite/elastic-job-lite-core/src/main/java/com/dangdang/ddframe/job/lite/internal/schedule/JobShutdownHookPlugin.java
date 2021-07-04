@@ -30,7 +30,7 @@ public final class JobShutdownHookPlugin extends ShutdownHookPlugin {
             return;
         }
         LeaderService leaderService = new LeaderService(regCenter, jobName);
-        if (leaderService.isLeader()) {
+        if (leaderService.isLeader()) { // 移除主节点
             leaderService.removeLeader();
         }
         new InstanceService(regCenter, jobName).removeInstance();

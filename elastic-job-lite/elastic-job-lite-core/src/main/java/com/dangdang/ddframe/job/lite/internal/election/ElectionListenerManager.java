@@ -66,13 +66,25 @@ public final class ElectionListenerManager extends AbstractListenerManager {
                 leaderService.electLeader();
             }
         }
-        
+
+        /**
+         * 主动选举，参加主节点选举：
+         * ( 1 ) 不存在主节点；
+         * ( 2 ) 开启作业，不再禁用
+         */
         private boolean isActiveElection(final String path, final String data) {
-            return !leaderService.hasLeader() && isLocalServerEnabled(path, data);
+            return !leaderService.hasLeader()// 不存在主节点
+                    && isLocalServerEnabled(path, data);// 开启作业
         }
-        
+
+        /**
+         * 被动选举，参加主节点选举：
+         * ( 1 ) 原主节点被删除；
+         * ( 2 ) 当前节点正在运行中（未挂掉）
+         */
         private boolean isPassiveElection(final String path, final Type eventType) {
-            return isLeaderCrashed(path, eventType) && serverService.isAvailableServer(JobRegistry.getInstance().getJobInstance(jobName).getIp());
+            return isLeaderCrashed(path, eventType) // 主节点 Crashed
+                    && serverService.isAvailableServer(JobRegistry.getInstance().getJobInstance(jobName).getIp());// 当前节点正在运行中（未挂掉）
         }
         
         private boolean isLeaderCrashed(final String path, final Type eventType) {
@@ -83,7 +95,10 @@ public final class ElectionListenerManager extends AbstractListenerManager {
             return serverNode.isLocalServerPath(path) && !ServerStatus.DISABLED.name().equals(data);
         }
     }
-    
+
+    /**
+     * 被禁用的作业注册作业启动信息时即使进行了主节点选举，也会被该监听器处理，移除该选举的主节点
+     */
     class LeaderAbdicationJobListener extends AbstractJobListener {
         
         @Override

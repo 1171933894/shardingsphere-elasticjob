@@ -43,10 +43,13 @@ public final class AverageAllocationJobShardingStrategy implements JobShardingSt
     
     @Override
     public Map<JobInstance, List<Integer>> sharding(final List<JobInstance> jobInstances, final String jobName, final int shardingTotalCount) {
+        // 不存在 作业运行实例
         if (jobInstances.isEmpty()) {
             return Collections.emptyMap();
         }
+        // 分配能被整除的部分
         Map<JobInstance, List<Integer>> result = shardingAliquot(jobInstances, shardingTotalCount);
+        // 分配不能被整除的部分
         addAliquant(jobInstances, shardingTotalCount, result);
         return result;
     }
@@ -57,6 +60,7 @@ public final class AverageAllocationJobShardingStrategy implements JobShardingSt
         int count = 0;
         for (JobInstance each : shardingUnits) {
             List<Integer> shardingItems = new ArrayList<>(itemCountPerSharding + 1);
+            // 顺序向下分配
             for (int i = count * itemCountPerSharding; i < (count + 1) * itemCountPerSharding; i++) {
                 shardingItems.add(i);
             }
@@ -67,7 +71,7 @@ public final class AverageAllocationJobShardingStrategy implements JobShardingSt
     }
     
     private void addAliquant(final List<JobInstance> shardingUnits, final int shardingTotalCount, final Map<JobInstance, List<Integer>> shardingResults) {
-        int aliquant = shardingTotalCount % shardingUnits.size();
+        int aliquant = shardingTotalCount % shardingUnits.size();// 余数
         int count = 0;
         for (Map.Entry<JobInstance, List<Integer>> entry : shardingResults.entrySet()) {
             if (count < aliquant) {

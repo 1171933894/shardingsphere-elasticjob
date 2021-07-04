@@ -51,13 +51,21 @@ public final class ShutdownListenerManager extends AbstractListenerManager {
     public void start() {
         addDataListener(new InstanceShutdownStatusJobListener());
     }
-    
+
+    /**
+     * 远程关闭作业节点有两种方式
+     *
+     * zkClient 发起命令：rmr /${NAMESPACE}/${JOB_NAME}/instances/${JOB_INSTANCE_ID}
+     * 运维平台发起 Shutdown 操作。Shutdown 操作实质上就是第一种
+     */
     class InstanceShutdownStatusJobListener extends AbstractJobListener {
         
         @Override
         protected void dataChanged(final String path, final Type eventType, final String data) {
-            if (!JobRegistry.getInstance().isShutdown(jobName) && !JobRegistry.getInstance().getJobScheduleController(jobName).isPaused()
-                    && isRemoveInstance(path, eventType) && !isReconnectedRegistryCenter()) {
+            if (!JobRegistry.getInstance().isShutdown(jobName)
+                    && !JobRegistry.getInstance().getJobScheduleController(jobName).isPaused()// 作业未暂停调度
+                    && isRemoveInstance(path, eventType)// 移除【运行实例】事件
+                    && !isReconnectedRegistryCenter()) {// 运行实例被移除
                 schedulerFacade.shutdownInstance();
             }
         }

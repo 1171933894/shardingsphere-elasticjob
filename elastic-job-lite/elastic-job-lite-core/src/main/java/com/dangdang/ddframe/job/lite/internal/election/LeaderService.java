@@ -49,6 +49,10 @@ public final class LeaderService {
     /**
      * 选举主节点.
      */
+    /**
+     * [zk: localhost:2181(CONNECTED) 7] get /elastic-job-example-lite-java/javaSimpleJob/leader/election/instance
+     * 192.168.16.137@-@82496
+     */
     public void electLeader() {
         log.debug("Elect a new leader now.");
         jobNodeStorage.executeInLeader(LeaderNode.LATCH, new LeaderElectionExecutionCallback());
@@ -65,6 +69,7 @@ public final class LeaderService {
      * @return 当前节点是否是主节点
      */
     public boolean isLeaderUntilBlock() {
+        // 不存在主节点 && 有可用的服务器节点
         while (!hasLeader() && serverService.hasAvailableServers()) {
             log.info("Leader is electing, waiting for {} ms", 100);
             BlockUtils.waitingShortTime();
@@ -105,6 +110,10 @@ public final class LeaderService {
         
         @Override
         public void execute() {
+            /**
+             * 必须调用hasLeader方法，LeaderLatch 只保证同一时间有且仅有一个工作节点，在获得分布式锁的工
+             * 作节点结束逻辑后，第二个工作节点会开始逻辑，如果不判断当前是否有主节点，原来的主节点会被覆盖
+             */
             if (!hasLeader()) {
                 jobNodeStorage.fillEphemeralJobNode(LeaderNode.INSTANCE, JobRegistry.getInstance().getJobInstance(jobName).getJobInstanceId());
             }

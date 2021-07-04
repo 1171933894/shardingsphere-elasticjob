@@ -78,6 +78,12 @@ public final class ShardingService {
     
     /**
      * 设置需要重新分片的标记.
+     *
+     * 调用 #setReshardingFlag() 方法设置需要重新分片的标记 /${JOB_NAME}/leader/sharding/necessary。
+     * 该 Zookeeper 数据节点是永久节点，存储空串( "" )，使用 zkClient 查看如下：
+     * [zk: localhost:2181(CONNECTED) 2] ls /elastic-job-example-lite-java/javaSimpleJob/leader/sharding
+     * [necessary]
+     * [zk: localhost:2181(CONNECTED) 3] get /elastic-job-example-lite-java/javaSimpleJob/leader/sharding/necessary
      */
     public void setReshardingFlag() {
         jobNodeStorage.createJobNodeIfNeeded(ShardingNode.NECESSARY);
