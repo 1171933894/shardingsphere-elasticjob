@@ -95,7 +95,10 @@ public final class FailoverListenerManager extends AbstractListenerManager {
             }
         }
     }
-    
+
+    /**
+     * 监听作业失效转移功能关闭
+     */
     class FailoverSettingsChangedJobListener extends AbstractJobListener {
         
         @Override

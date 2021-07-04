@@ -36,6 +36,13 @@ import java.util.List;
  * 
  * @author zhangliang
  */
+
+/**
+ * 【失效转移】
+ * 运行中的作业服务器崩溃不会导致重新分片，只会在下次作业启动时分片。启用失效转移功能可以在本次作业执行
+ * 过程中，监测其他作业服务器空闲，抓取未完成的孤儿分片项执行。实现失效转移功能，在某台服务器执行完毕后
+ * 主动抓取未分配的分片，并且在某台服务器下线后主动寻找可用的服务器执行任务
+ */
 @Slf4j
 public final class FailoverService {
     
@@ -155,6 +162,13 @@ public final class FailoverService {
             if (JobRegistry.getInstance().isShutdown(jobName) || !needFailover()) {
                 return;
             }
+            /**
+             * 只会抓取一个失效转移的作业分片，这样带来的好处是，多个作业分片可以一起承担执行失效转移的分片集合。
+             * 举个例子：一个作业集群有 A / B / C 三个节点，分成六个作业分片，如果 C 节点挂了，A / B 节点分担
+             * C 节点的两个分片。但是，也可能会存在失效转移的分片被漏执行。举个例子：一个作业集群有 A / B / C
+             * 三个节点，分成九个作业分片，如果 C 节点挂了，A / B 节点分担 C 节点的两个分片，有一个被漏掉，只能
+             * 等下次作业分片才能执行
+             */
             int crashedItem = Integer.parseInt(jobNodeStorage.getJobNodeChildrenKeys(FailoverNode.ITEMS_ROOT).get(0));
             log.debug("Failover job '{}' begin, crashed item '{}'", jobName, crashedItem);
             jobNodeStorage.fillEphemeralJobNode(FailoverNode.getExecutionFailoverNode(crashedItem), JobRegistry.getInstance().getJobInstance(jobName).getJobInstanceId());
@@ -162,7 +176,7 @@ public final class FailoverService {
             // TODO 不应使用triggerJob, 而是使用executor统一调度
             JobScheduleController jobScheduleController = JobRegistry.getInstance().getJobScheduleController(jobName);
             if (null != jobScheduleController) {
-                jobScheduleController.triggerJob();
+                jobScheduleController.triggerJob();// 触发作业执行
             }
         }
     }
