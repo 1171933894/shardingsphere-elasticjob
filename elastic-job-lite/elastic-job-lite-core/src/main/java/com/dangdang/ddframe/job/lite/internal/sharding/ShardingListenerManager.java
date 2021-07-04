@@ -66,7 +66,9 @@ public final class ShardingListenerManager extends AbstractListenerManager {
             if (configNode.isConfigPath(path) && 0 != JobRegistry.getInstance().getCurrentShardingTotalCount(jobName)) {
                 int newShardingTotalCount = LiteJobConfigurationGsonFactory.fromJson(data).getTypeConfig().getCoreConfig().getShardingTotalCount();
                 if (newShardingTotalCount != JobRegistry.getInstance().getCurrentShardingTotalCount(jobName)) {
+                    // 设置需要重新分片的标记
                     shardingService.setReshardingFlag();
+                    // 设置当前分片总数
                     JobRegistry.getInstance().setCurrentShardingTotalCount(jobName, newShardingTotalCount);
                 }
             }
@@ -77,7 +79,9 @@ public final class ShardingListenerManager extends AbstractListenerManager {
         
         @Override
         protected void dataChanged(final String path, final Type eventType, final String data) {
-            if (!JobRegistry.getInstance().isShutdown(jobName) && (isInstanceChange(eventType, path) || isServerChange(path))) {
+            if (!JobRegistry.getInstance().isShutdown(jobName)
+                    && (isInstanceChange(eventType, path) || isServerChange(path))) {
+                // 设置需要重新分片的标记
                 shardingService.setReshardingFlag();
             }
         }
